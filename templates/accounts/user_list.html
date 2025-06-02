@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Authors - BlogHub{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Page Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center">
+                <h1 class="display-4 fw-bold text-gradient-pro mb-3">
+                    <i class="fas fa-users me-3"></i>Meet Our Authors
+                </h1>
+                <p class="lead text-muted">
+                    Discover talented writers and thought leaders sharing their expertise on BlogHub
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authors Grid -->
+    <div class="row g-4">
+        {% for user in users %}
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 author-card">
+                <div class="card-body text-center p-4">
+                    <!-- Author Avatar -->
+                    <div class="author-avatar-container mb-3">
+                        {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" 
+                             class="author-avatar-large rounded-circle">
+                        {% else %}
+                        <div class="author-avatar-large-placeholder rounded-circle mx-auto d-flex align-items-center justify-content-center">
+                            {{ user.username|first|upper }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Author Info -->
+                    <h5 class="fw-bold mb-2">
+                        {{ user.get_full_name|default:user.username }}
+                    </h5>
+                    
+                    <p class="text-muted small mb-3">
+                        <i class="fas fa-user me-1"></i>@{{ user.username }}
+                    </p>
+
+                    {% if user.profile.bio %}
+                    <p class="text-muted mb-3">
+                        {{ user.profile.bio|truncatewords:20 }}
+                    </p>
+                    {% endif %}
+
+                    <!-- Author Stats -->
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <div class="stat-item">
+                                <h6 class="fw-bold text-primary mb-0">{{ user.blogpost_set.count }}</h6>
+                                <small class="text-muted">Posts</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-item">
+                                <h6 class="fw-bold text-primary mb-0">{{ user.date_joined|date:"M Y" }}</h6>
+                                <small class="text-muted">Joined</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Links -->
+                    {% if user.profile.website or user.profile.twitter or user.profile.instagram %}
+                    <div class="social-links mb-3">
+                        {% if user.profile.website %}
+                        <a href="{{ user.profile.website }}" target="_blank" class="btn btn-outline-primary btn-sm me-1">
+                            <i class="fas fa-globe"></i>
+                        </a>
+                        {% endif %}
+                        {% if user.profile.twitter %}
+                        <a href="https://twitter.com/{{ user.profile.twitter }}" target="_blank" class="btn btn-outline-info btn-sm me-1">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        {% endif %}
+                        {% if user.profile.instagram %}
+                        <a href="https://instagram.com/{{ user.profile.instagram }}" target="_blank" class="btn btn-outline-danger btn-sm me-1">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- View Profile Button -->
+                    <a href="{% url 'accounts:profile' user.username %}" class="btn btn-primary">
+                        <i class="fas fa-eye me-2"></i>View Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">No authors found</h4>
+                <p class="text-muted">Be the first to join our community of writers!</p>
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary">
+                    <i class="fas fa-user-plus me-2"></i>Join Now
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if users.has_other_pages %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <nav aria-label="Authors pagination">
+                <ul class="pagination justify-content-center">
+                    {% if users.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ users.previous_page_number }}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in users.paginator.page_range %}
+                    {% if users.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > users.number|add:'-3' and num < users.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if users.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ users.next_page_number }}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ users.paginator.num_pages }}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Author Card Styling */
+.author-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+}
+
+.author-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    border-color: var(--primary-pink);
+}
+
+.author-avatar-container {
+    position: relative;
+}
+
+.author-avatar-large {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 3px solid var(--light-cream);
+    transition: all 0.3s ease;
+}
+
+.author-avatar-large-placeholder {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--primary-pink), var(--primary-teal));
+    color: var(--white);
+    font-size: 2rem;
+    font-weight: 700;
+    border: 3px solid var(--light-cream);
+}
+
+.author-card:hover .author-avatar-large,
+.author-card:hover .author-avatar-large-placeholder {
+    transform: scale(1.1);
+    border-color: var(--primary-pink);
+}
+
+.stat-item {
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: rgba(233, 30, 99, 0.05);
+}
+
+.social-links .btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.social-links .btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Professional Pagination */
+.pagination .page-link {
+    border: 1px solid var(--border-light);
+    color: var(--text-dark);
+    padding: 0.75rem 1rem;
+    margin: 0 0.125rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    background: var(--primary-pink);
+    border-color: var(--primary-pink);
+    color: var(--white);
+    transform: translateY(-1px);
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--primary-pink);
+    border-color: var(--primary-pink);
+    color: var(--white);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .author-avatar-large,
+    .author-avatar-large-placeholder {
+        width: 80px;
+        height: 80px;
+        font-size: 1.5rem;
+    }
+    
+    .stat-item h6 {
+        font-size: 1rem;
+    }
+}
+</style>
+{% endblock %}

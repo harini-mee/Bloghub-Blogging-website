@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Login - BlogHub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center login-form">
+    <div class="col-md-5">
+        <div class="card shadow login-card">
+            <div class="card-header login-header text-white text-center">
+                <h3><i class="fas fa-sign-in-alt me-2"></i>Welcome Back</h3>
+                <p class="mb-0">Sign in to your BlogHub account</p>
+            </div>
+            <div class="card-body login-body">
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label fw-bold text-dark">Username</label>
+                        <div class="input-group login-input-group">
+                            <span class="input-group-text login-icon"><i class="fas fa-user"></i></span>
+                            {{ form.username }}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.password.id_for_label }}" class="form-label fw-bold text-dark">Password</label>
+                        <div class="input-group login-input-group">
+                            <span class="input-group-text login-icon"><i class="fas fa-lock"></i></span>
+                            {{ form.password }}
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg login-btn">
+                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-3">
+                    <a href="{% url 'accounts:password_reset' %}" class="text-decoration-none small forgot-link">
+                        Forgot your password?
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer login-footer text-center border-top">
+                <p class="mb-0 text-muted">
+                    Don't have an account?
+                    <a href="{% url 'accounts:register' %}" class="text-decoration-none fw-bold register-link">Create one here</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Quick Access -->
+        <div class="card mt-4 border-0 shadow-sm quick-access-card">
+            <div class="card-header quick-access-header text-white">
+                <h6 class="mb-0"><i class="fas fa-rocket me-2"></i>Quick Access</h6>
+            </div>
+            <div class="card-body quick-access-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <a href="{% url 'blog:home' %}" class="text-decoration-none quick-link">
+                            <i class="fas fa-home fa-2x quick-icon-pink mb-2"></i>
+                            <p class="small mb-0">Browse Posts</p>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="{% url 'accounts:user_list' %}" class="text-decoration-none quick-link">
+                            <i class="fas fa-users fa-2x quick-icon-teal mb-2"></i>
+                            <p class="small mb-0">Authors</p>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="{% url 'blog:search' %}" class="text-decoration-none quick-link">
+                            <i class="fas fa-search fa-2x quick-icon-pink mb-2"></i>
+                            <p class="small mb-0">Search</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
